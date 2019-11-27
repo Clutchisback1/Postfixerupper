@@ -12,13 +12,16 @@ print("""
 """)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-d', help='Name of your domain', dest='domain_name')
-parser.add_argument('-H', help='Name of your hostname', dest='hostname')
+parser.add_argument('-d', '--domain', help='Name of your domain', dest='domain_name')
 args = parser.parse_args()
 
 domain_name = args.domain_name
-hostname = args.hostname
 
+if domain_name == None:
+    domain_name = str("localhost.members.linode.com")
+    print("No Domain selected...Setting default postfix domain name")
+    time.sleep(2)
+    
 
 text = ("""
 # See /usr/share/postfix/main.cf.dist for a commented, more complete version
@@ -55,7 +58,7 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 # information on enabling SSL in the smtp client.
 
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
-#myhostname = """+str(hostname)+""" #Default setting for linode is: localhost.members.linode.com
+#myhostname = localhost.members.linode.com
 myhostname = """+str(domain_name)+"""
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
@@ -82,10 +85,6 @@ smtp_tls_loglevel = 1
 smtpd_tls_loglevel = 1
 """)
 
-if domain_name == None:
-    print("Please enter domain name")
-elif hostname == None:
-    print("Please enter your Jumpbox hostname")
-else:
-    time.sleep(1)
-    print(text)
+print("Domain: " + domain_name + " selected...")
+time.sleep(2)
+print(text)
